@@ -81,9 +81,10 @@ class DbObject {
                 $values[] = "'".$this->db->escape($this->data[$field])."'";
             }
 
-            $query = "insert into ".$this->tableName."(".implode(",", $fields).") values(".implode($values).")";
+            $query = "insert into ".$this->tableName."(".implode(",", $fields).") values(".implode(",", $values).")";
             $res = $this->db->query($query);
             $this->$primaryKey = $this->db->last_insert_id();
+            $this->isNew = false;
 
             return $this;
         }
@@ -110,7 +111,7 @@ class DbCollection extends Singleton {
 
     public function create($data) {
         $allFields = array_merge(array($this->primaryKey), $this->fields);
-        $obj  = new DbObject($data, $allFields, $this->tableName, $this->primaryKey, $this->db, true);
+        $obj  = new DbObject($data, $allFields, $this->tableName, $this->primaryKey, $this->db, true, $this);
         $obj = $obj->save();
         $this->collection[$obj->id()] = $obj;
         return $obj;

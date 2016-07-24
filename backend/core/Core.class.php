@@ -78,5 +78,9 @@ $_core->loadModel("Paintings");
 
 $paintings = Paintings::getInstance();
 $allPaintings = $paintings->getAll();
+$paint2 = $paintings->create(array(
+    "original_name" => "Николаич3",
+    "alias" => "nickolich_progait"
+));
 
-var_dump($allPaintings[1]->toArray());
+//var_dump($paint2);
