@@ -92,7 +92,7 @@ class DbObject {
     }
 };
 
-class DbCollection {
+class DbCollection extends Singleton {
     protected $tableName;
     protected $fields;
     protected $primaryKey = "id";
@@ -153,7 +153,8 @@ class DbCollection {
 }
 
 class DbCollectionInterface extends DbCollection {
-    function __construct ($db, $fields) {
+    function __construct ($fields) {
+        $db = Db::getInstance();
         $tableName = "object_".mb_strtolower(get_class($this));
         parent::__construct($db, $fields, $tableName);
     }

@@ -2,9 +2,15 @@
 
 class Core {
     private $config;
+    public $bundles;
     const CONFIG_FILE_PATH = "/config/config.inc.php";
     const BUNDLES_PATH = "/bundles/";
     const MODELS_PATH = "/models/";
+    const MISC_PATH = "/misc_classes/";
+
+    public static function getAbsolutePath($relative) {
+        return dirname(__FILE__).$relative;
+    }
 
     function __construct() {
         require_once(dirname(__FILE__).self::CONFIG_FILE_PATH);
@@ -25,6 +31,17 @@ class Core {
         }
     }
 
+    public function loadModel($name) {
+        $db = Db::getInstance();
+        if (is_object($db))
+        try {
+            $model = new $name($db);
+            return $model;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     private function initBundles() {
         $bundlesPath = dirname(__FILE__).self::BUNDLES_PATH;
         if ($handle = opendir($bundlesPath)) {
@@ -33,8 +50,16 @@ class Core {
                     $bundleClassName = mb_strtolower($dir);
                     echo "loading bundle $bundleClassName\n";
                     require_once ($bundlesPath.$dir."/$bundleClassName.class.php");
+                    $bundleClassNameUpper = ucfirst($bundleClassName);
+                    $this->bundles[$bundleClassNameUpper] = array("name" => $bundleClassNameUpper);
                 }
             }
+        }
+    }
+
+    public function createBundle($name) {
+        if (isset($this->bundles[$name])) {
+            $this->bundles[$name]["bundle"] = new $name();
         }
     }
 
@@ -48,8 +73,10 @@ class Core {
 }
 
 $_core = new Core();
-$db = new Db();
+$_core->createBundle("Db");
+$_core->loadModel("Paintings");
 
-//$paintings = new Paintings($db);
-//$allPaintings = $paintings->getAll();
-//$allPaintings[5]->delete();
+$paintings = Paintings::getInstance();
+$allPaintings = $paintings->getAll();
+
+var_dump($allPaintings[1]->toArray());

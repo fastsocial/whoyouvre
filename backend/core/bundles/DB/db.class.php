@@ -1,6 +1,8 @@
 <?php
 
-class Db {
+require_once Core::getAbsolutePath(Core::MISC_PATH)."autoload.inc.php";
+
+class Db extends Singleton {
     private $db;
     public function __construct() {
         global $_core;
